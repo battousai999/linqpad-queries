@@ -1,5 +1,5 @@
 <Query Kind="Program">
-  <Reference Relative="..\..\Downloads\Microsoft.Solver.Foundation.dll">C:\Users\kjones\Downloads\Microsoft.Solver.Foundation.dll</Reference>
+  <NuGetReference>Microsoft.Solver.Foundation</NuGetReference>
   <Namespace>Microsoft.SolverFoundation.Common</Namespace>
   <Namespace>System.Numerics</Namespace>
 </Query>
