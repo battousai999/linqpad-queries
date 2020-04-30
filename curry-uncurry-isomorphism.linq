@@ -2,46 +2,46 @@
 
 void Main()
 {
-    var value1 = FirstFunction("testing", 3);
-    var value2 = SecondFunction("testing")(3);
+    var uncurried1 = AlreadyUncurriedFunction("testing", 3);
+    var curried1 = AlreadyCurriedFunction("testing")(3);
     
-    value1.Dump();
-    value2.Dump();
-    (value1 == value2).Dump();
+    uncurried1.Dump();
+    curried1.Dump();
+    (uncurried1 == curried1).Dump();
     
     Console.WriteLine("---------------------");
     
-    Func<string, Func<byte, int>> func3 = Curry<string, byte, int>(FirstFunction);
-    Func<string, byte, int> func4 = Uncurry<string, byte, int>(SecondFunction);
+    Func<string, Func<byte, int>> func3 = Curry<string, byte, int>(AlreadyUncurriedFunction);
+    Func<string, byte, int> func4 = Uncurry<string, byte, int>(AlreadyCurriedFunction);
     
-    var value3 = func3("testing")(3);
-    var value4 = func4("testing", 3);
+    var curried2 = func3("testing")(3);
+    var uncurried2 = func4("testing", 3);
     
-    value3.Dump();
-    value4.Dump();
+    curried2.Dump();
+    uncurried2.Dump();
     
     Console.WriteLine("----------------------");
     
-    Func<string, byte, int> func5 = Uncurry<string, byte, int>(Curry<string, byte, int>(FirstFunction));
-    Func<string, Func<byte, int>> func6 = Curry<string, byte, int>(Uncurry<string, byte, int>(SecondFunction));
+    Func<string, byte, int> func5 = Uncurry<string, byte, int>(Curry<string, byte, int>(AlreadyUncurriedFunction));
+    Func<string, Func<byte, int>> func6 = Curry<string, byte, int>(Uncurry<string, byte, int>(AlreadyCurriedFunction));
     
-    var value5 = func5("testing", 3);
-    var value6 = func6("testing")(3);
+    var uncurried3 = func5("testing", 3);
+    var curried3 = func6("testing")(3);
     
-    value5.Dump();
-    value6.Dump();
+    uncurried3.Dump();
+    curried3.Dump();
 }
 
 // Define other methods and classes here
 
 // (string, byte) -> int
-public int FirstFunction(string str, byte val)
+public int AlreadyUncurriedFunction(string str, byte val)
 {
     return (str.Length + val);
 }
 
 // string -> (byte -> int)  or  string -> byte -> int
-public Func<byte, int> SecondFunction(string str)
+public Func<byte, int> AlreadyCurriedFunction(string str)
 {
     return (val => str.Length + val);
 }
