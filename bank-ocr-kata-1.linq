@@ -1,6 +1,6 @@
 <Query Kind="Program">
-  <Reference Relative="assemblies\MoreLinq.dll">&lt;MyDocuments&gt;\LINQPad Queries\assemblies\MoreLinq.dll</Reference>
-  <Reference Relative="assemblies\System.ValueTuple.dll">&lt;MyDocuments&gt;\LINQPad Queries\assemblies\System.ValueTuple.dll</Reference>
+  <NuGetReference>morelinq</NuGetReference>
+  <NuGetReference>System.ValueTuple</NuGetReference>
   <Namespace>MoreLinq</Namespace>
 </Query>
 
