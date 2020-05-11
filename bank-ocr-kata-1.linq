@@ -214,7 +214,7 @@ public class ScannedFigureDecoder
         if (blockLines.Count < 3 || blockLines.Count > 4)
             throw new ArgumentException(nameof(lines), "There must be either 3 or 4 lines");
             
-        if (blockLines.Count < 4 && !String.IsNullOrWhiteSpace(blockLines[3]))
+        if (blockLines.Count == 4 && !String.IsNullOrWhiteSpace(blockLines[3]))
             throw new ArgumentException(nameof(lines), "The fourth line (if included) must be empty or only contain whitespace");
             
         blockLines = blockLines.Take(3).ToList();
