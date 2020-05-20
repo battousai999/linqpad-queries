@@ -198,6 +198,7 @@ public class ConsoleSection
         if (startingCursorVisible != null)
             Console.CursorVisible = startingCursorVisible.Value;
 
+        // Rewrite the last line in order to ensure that the console prompt does not overwrite the last line
         var lastLine = lines.LastOrDefault();
 
         if (lastLine != null)
