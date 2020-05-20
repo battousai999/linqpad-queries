@@ -129,12 +129,18 @@ public class ConsoleSection
     {
         UpdateLine(new ConsoleLine(text));
     }
-    
+
+    public void UpdateLineWithText(string text)
+    {
+        var lastLineIndex = Count - 1;
+        UpdateLine(lastLineIndex, lines[lastLineIndex].WithText(text));
+    }
+
     public void UpdateLine(ConsoleLine line)
     {
-        UpdateLine(0, line);
+        UpdateLine(Count - 1, line);
     }
-    
+
     public void UpdateLine(int index, string text)
     {
         UpdateLine(index, new ConsoleLine(text));
