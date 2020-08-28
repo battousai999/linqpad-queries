@@ -79,18 +79,18 @@ void Main()
         if (message.IsGenesysMessage)
         {
             Console.Write(message.GetGenesysMessage().PadRight(genesysPadding));
-            Console.WriteLine(message.IsReceivedMessage ? "  ==>            " : " <==             ");
+            Console.WriteLine(message.IsReceivedMessage ? "  ==>  | |       " : " <==   | |       ");
         }
         else if (message.IsSscMessage)
         {
             Console.Write(nonGenesysInitialSpacing);
-            Console.Write(message.IsSentMessage ? "             ==> " : "            <==  ");
+            Console.Write(message.IsSentMessage ? "       | |   ==> " : "       | |  <==  ");
             Console.WriteLine(message.GetSscMessage());
         }
         else if (message.IsFubuMessage)
         {
             Console.Write(nonGenesysInitialSpacing);
-            Console.Write(message.IsSentMessage ? "             ==> " : "            <==  ");
+            Console.Write(message.IsSentMessage ? "       | |   ==> " : "       | |  <==  ");
             Console.Write(fubuAfterSpacing);
             Console.WriteLine(message.GetFubuMessage());
         }
