@@ -113,13 +113,13 @@ public class TextEnclosure
                 var upperMiddle = new string(TopBorder ?? ' ', text.Length);
                 var upperRight = UpperRightCornerBorder?.ToString() ?? (hasRightColumn ? " " : "");
 
-                yield return $"{upperLeft}{upperMiddle}{upperRight}";
+                yield return upperMiddle.Bracket(upperLeft, upperRight, true);
             }
             
             var midLeft = LeftBorder?.ToString() ?? (hasLeftColumn ? " " : "");
             var midRight = RightBorder?.ToString() ?? (hasRightColumn ? " " : "");
             
-            yield return $"{midLeft}{text}{midRight}";
+            yield return text.Bracket(midLeft, midRight, true);
             
             if (hasBottomRow)
             {
@@ -127,7 +127,7 @@ public class TextEnclosure
                 var lowerMiddle = new string(BottomBorder ?? ' ', text.Length);
                 var lowerRight = LowerRightCornerBorder?.ToString() ?? (hasRightColumn ? " " : "");
 
-                yield return $"{lowerLeft}{lowerMiddle}{lowerRight}";
+                yield return lowerMiddle.Bracket(lowerLeft, lowerRight, true);
             }
         }
         
