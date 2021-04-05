@@ -20,6 +20,10 @@ void Main()
     var enclosure2 = new TextEnclosure('═', '═', null, null, null, null, null, null, null, null, null);
     
     DisplayWithFixedFont(enclosure2.Enclose("This is a Header"));
+    
+    DisplayWithFixedFont(TextEnclosure.Border('*').Enclose(" With an asterisk "));
+    
+    DisplayWithFixedFont(TextEnclosure.Border('█').Enclose(" With a block border "));
 }
 
 public void DisplayWithFixedFont<T>(T value)
@@ -82,6 +86,11 @@ public class TextEnclosure
     public static TextEnclosure DoubleBorder(int? maxTextSize = null, int? minTextSize = null, string ellipsis = "...")
     {
         return new TextEnclosure('═', '═', '║', '║', '╔', '╗', '╝', '╚', minTextSize, maxTextSize, ellipsis);
+    }
+    
+    public static TextEnclosure Border(char borderChar, int? maxTextSize = null, int? minTextSize = null, string ellipsis = "...")
+    {
+        return new TextEnclosure(borderChar, borderChar, borderChar, borderChar, borderChar, borderChar, borderChar, borderChar, maxTextSize, minTextSize, ellipsis);
     }
     
     public string Enclose(Func<TextEnclosure, string> textFunc)
