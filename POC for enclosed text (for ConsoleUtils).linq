@@ -14,6 +14,12 @@ void Main()
 
             return $"{spacing}{text}{spacing}";
         }));
+        
+    DisplayWithFixedFont(TextEnclosure.DoubleBorder().Enclose(" This is something else "));
+    
+    var enclosure2 = new TextEnclosure('═', '═', null, null, null, null, null, null, null, null, null);
+    
+    DisplayWithFixedFont(enclosure2.Enclose("This is a Header"));
 }
 
 public void DisplayWithFixedFont<T>(T value)
@@ -71,12 +77,18 @@ public class TextEnclosure
     {
         return new TextEnclosure('─', '─', '│', '│', '┌', '┐', '┘', '└', minTextSize, maxTextSize, ellipsis);
     }
+
+
+    public static TextEnclosure DoubleBorder(int? maxTextSize = null, int? minTextSize = null, string ellipsis = "...")
+    {
+        return new TextEnclosure('═', '═', '║', '║', '╔', '╗', '╝', '╚', minTextSize, maxTextSize, ellipsis);
+    }
     
     public string Enclose(Func<TextEnclosure, string> textFunc)
     {
         return Enclose(textFunc(this));
     }
-    
+
     public string Enclose(string text)
     {
         if (text == null)
