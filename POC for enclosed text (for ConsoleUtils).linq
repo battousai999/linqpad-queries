@@ -4,7 +4,8 @@ void Main()
 {
     var enclosure = TextEnclosure.SingleBorder(40);
     
-    DisplayWithFixedFont(enclosure.Enclose(" This is a test "));
+    DisplayWithFixedFont(enclosure.Enclose("This is a test"));
+    DisplayWithFixedFont(enclosure.Enclose("This is a test\nAnd this is another"));
 
     DisplayWithFixedFont(
         enclosure.Enclose(x =>
@@ -15,15 +16,15 @@ void Main()
             return $"{spacing}{text}{spacing}";
         }));
         
-    DisplayWithFixedFont(TextEnclosure.DoubleBorder().Enclose(" This is something else "));
+    DisplayWithFixedFont(TextEnclosure.DoubleBorder().Enclose("This is something else"));
     
-    var enclosure2 = new TextEnclosure('═', '═', null, null, null, null, null, null, null, null, null);
+    var enclosure2 = new TextEnclosure('═', '═', null, null, null, null, null, null, null, null, null, 0);
     
     DisplayWithFixedFont(enclosure2.Enclose("This is a Header"));
     
-    DisplayWithFixedFont(TextEnclosure.Border('*').Enclose(" With an asterisk "));
+    DisplayWithFixedFont(TextEnclosure.Border('*').Enclose("With an asterisk"));
     
-    DisplayWithFixedFont(TextEnclosure.Border('█').Enclose(" With a block border "));
+    DisplayWithFixedFont(TextEnclosure.Border('█', null, null, null, 2, 1).Enclose("With a block border"));
 }
 
 public void DisplayWithFixedFont<T>(T value)
@@ -45,9 +46,11 @@ public class TextEnclosure
     public readonly int? MinTextSize;
     public readonly int? MaxTextSize;
     public readonly string Ellipsis;
+    public readonly int HorizontalPadding;
+    public readonly int VerticalPadding;
     
     public TextEnclosure()
-        : this('─', '─', '│', '│', '┌', '┐', '┘', '└', null, null, "...")
+        : this('─', '─', '│', '│', '┌', '┐', '┘', '└')
     {
     }
     
@@ -60,10 +63,18 @@ public class TextEnclosure
         char? upperRightCornerBorder,
         char? lowerRightCornerBorder,
         char? lowerLeftCornerBorder,
-        int? minTextSize,
-        int? maxTextSize,
-        string ellipsis)
+        int? minTextSize = null,
+        int? maxTextSize = null,
+        string ellipsis = "...",
+        int horizontalPadding = 1,
+        int verticalPadding = 0)
     {
+        if (horizontalPadding < 0)
+            throw new ArgumentException($"Horizontal padding ({horizontalPadding}) must be greater than or equal to 0", nameof(horizontalPadding));
+            
+        if (verticalPadding < 0)
+            throw new ArgumentException($"Vertical padding ({verticalPadding}) must be greater than or equal to 0", nameof(verticalPadding));
+        
         TopBorder = topBorder;
         BottomBorder = bottomBorder;
         LeftBorder = leftBorder;
@@ -75,72 +86,163 @@ public class TextEnclosure
         MinTextSize = minTextSize;
         MaxTextSize = maxTextSize;
         Ellipsis = ellipsis;
+        HorizontalPadding = horizontalPadding;
+        VerticalPadding = verticalPadding;
     }
     
-    public static TextEnclosure SingleBorder(int? maxTextSize = null, int? minTextSize = null, string ellipsis = "...")
+    public static TextEnclosure SingleBorder(
+        int? maxTextSize = null, 
+        int? minTextSize = null, 
+        string ellipsis = "...", 
+        int horizontalPadding = 1, 
+        int verticalPadding = 0)
     {
-        return new TextEnclosure('─', '─', '│', '│', '┌', '┐', '┘', '└', minTextSize, maxTextSize, ellipsis);
+        return new TextEnclosure('─', '─', '│', '│', '┌', '┐', '┘', '└', minTextSize, maxTextSize, ellipsis, horizontalPadding, verticalPadding);
     }
 
 
-    public static TextEnclosure DoubleBorder(int? maxTextSize = null, int? minTextSize = null, string ellipsis = "...")
+    public static TextEnclosure DoubleBorder(
+        int? maxTextSize = null, 
+        int? minTextSize = null, 
+        string ellipsis = "...", 
+        int horizontalPadding = 1, 
+        int verticalPadding = 0)
     {
-        return new TextEnclosure('═', '═', '║', '║', '╔', '╗', '╝', '╚', minTextSize, maxTextSize, ellipsis);
+        return new TextEnclosure('═', '═', '║', '║', '╔', '╗', '╝', '╚', minTextSize, maxTextSize, ellipsis, horizontalPadding, verticalPadding);
     }
     
-    public static TextEnclosure Border(char borderChar, int? maxTextSize = null, int? minTextSize = null, string ellipsis = "...")
+    public static TextEnclosure Border(
+        char borderChar, 
+        int? maxTextSize = null, 
+        int? minTextSize = null, 
+        string ellipsis = "...", 
+        int horizontalPadding = 1, 
+        int verticalPadding = 0)
     {
-        return new TextEnclosure(borderChar, borderChar, borderChar, borderChar, borderChar, borderChar, borderChar, borderChar, maxTextSize, minTextSize, ellipsis);
+        return new TextEnclosure(
+            borderChar, 
+            borderChar, 
+            borderChar, 
+            borderChar, 
+            borderChar, 
+            borderChar, 
+            borderChar, 
+            borderChar, 
+            maxTextSize, 
+            minTextSize, 
+            ellipsis, 
+            horizontalPadding, 
+            verticalPadding);
     }
     
     public string Enclose(Func<TextEnclosure, string> textFunc)
     {
         return Enclose(textFunc(this));
     }
-
+    
     public string Enclose(string text)
+    {
+        return String.Join(Environment.NewLine, EncloseAsList(text));
+    }
+    
+    public string Encluse(IEnumerable<string> lines)
+    {
+        return String.Join(Environment.NewLine, EncloseAsList(lines));
+    }
+    
+    public IEnumerable<string> EncloseAsList(Func<TextEnclosure, string> textFunc)
+    {
+        return EncloseAsList(textFunc(this));
+    }
+
+    public IEnumerable<string> EncloseAsList(string text)
     {
         if (text == null)
             throw new ArgumentNullException(nameof(text));
         
-        if (text.Length < MinTextSize)
-            text = text.PadRight(MinTextSize.Value);
+        return EncloseAsList(text.ToSingleton());
+    }
+    
+    public IEnumerable<string> EncloseAsList(IEnumerable<string> lines)
+    {
+        if (lines == null)
+            throw new ArgumentNullException(nameof(lines));
+
+        // Function to give each line padding, ellipsis, etc.
+        string transformLine(string line)
+        {
+            if (line.Length < MinTextSize)
+                line = line.PadRight(MinTextSize.Value);
+
+            if (line.Length > MaxTextSize)
+                line = line.PadRightWithEllipsis(MaxTextSize.Value, Ellipsis);
+
+            if (HorizontalPadding > 0)
+            {
+                var leadingSpace = line.TakeWhile(x => x == ' ').Count();
+                var trailingSpace = line.Reverse().TakeWhile(x => x == ' ').Count();
+                var leftPadding = new string(' ', Math.Max(HorizontalPadding - leadingSpace, 0));
+                var rightPadding = new string(' ', Math.Max(HorizontalPadding - trailingSpace, 0));
+
+                if (String.IsNullOrEmpty(line))
+                    line = (leftPadding.Length > rightPadding.Length ? leftPadding : rightPadding);
+                else
+                    line = line.Bracket(leftPadding, rightPadding);
+            }
             
-        if (text.Length > MaxTextSize)
-            text = text.PadRightWithEllipsis(MaxTextSize.Value, Ellipsis);
+            return line;
+        }
+
+        var splitLines = lines
+            .SelectMany(x => x.Split(new string[] { Environment.NewLine, "\n" }, StringSplitOptions.None))
+            .Select(transformLine)
+            .ToList();
             
+        var largestLineLength = splitLines.Max(x => x.Length);
+
         var hasTopRow = UpperLeftCornerBorder != null || TopBorder != null || UpperRightCornerBorder != null;
         var hasBottomRow = LowerLeftCornerBorder != null || BottomBorder != null || LowerRightCornerBorder != null;
         var hasLeftColumn = UpperLeftCornerBorder != null || LeftBorder != null || LowerLeftCornerBorder != null;
         var hasRightColumn = UpperRightCornerBorder != null || RightBorder != null || LowerRightCornerBorder != null;
         
-        IEnumerable<string> helper()
+        // Top border row
+        if (hasTopRow)
         {
-            if (hasTopRow)
-            {
-                var upperLeft = UpperLeftCornerBorder?.ToString() ?? (hasLeftColumn ? " " : "");
-                var upperMiddle = new string(TopBorder ?? ' ', text.Length);
-                var upperRight = UpperRightCornerBorder?.ToString() ?? (hasRightColumn ? " " : "");
+            var upperLeft = UpperLeftCornerBorder?.ToString() ?? (hasLeftColumn ? " " : "");
+            var upperMiddle = new string(TopBorder ?? ' ', largestLineLength);
+            var upperRight = UpperRightCornerBorder?.ToString() ?? (hasRightColumn ? " " : "");
 
-                yield return upperMiddle.Bracket(upperLeft, upperRight, true);
-            }
-            
-            var midLeft = LeftBorder?.ToString() ?? (hasLeftColumn ? " " : "");
-            var midRight = RightBorder?.ToString() ?? (hasRightColumn ? " " : "");
-            
-            yield return text.Bracket(midLeft, midRight, true);
-            
-            if (hasBottomRow)
-            {
-                var lowerLeft = LowerLeftCornerBorder?.ToString() ?? (hasLeftColumn ? " " : "");
-                var lowerMiddle = new string(BottomBorder ?? ' ', text.Length);
-                var lowerRight = LowerRightCornerBorder?.ToString() ?? (hasRightColumn ? " " : "");
-
-                yield return lowerMiddle.Bracket(lowerLeft, lowerRight, true);
-            }
+            yield return upperMiddle.Bracket(upperLeft, upperRight, true);
         }
         
-        return String.Join(Environment.NewLine, helper());
+        // Middle "text" rows
+        var midLeft = LeftBorder?.ToString() ?? (hasLeftColumn ? " " : "");
+        var midRight = RightBorder?.ToString() ?? (hasRightColumn ? " " : "");
+
+        for (int i = 0; i < VerticalPadding; i++)
+        {
+            yield return String.Empty.PadRight(largestLineLength).Bracket(midLeft, midRight, true);
+        }
+
+        foreach (var line in splitLines)
+        {
+            yield return line.PadRight(largestLineLength).Bracket(midLeft, midRight, true);
+        }
+
+        for (int i = 0; i < VerticalPadding; i++)
+        {
+            yield return String.Empty.PadRight(largestLineLength).Bracket(midLeft, midRight, true);
+        }
+
+        // Bottom border row
+        if (hasBottomRow)
+        {
+            var lowerLeft = LowerLeftCornerBorder?.ToString() ?? (hasLeftColumn ? " " : "");
+            var lowerMiddle = new string(BottomBorder ?? ' ', largestLineLength);
+            var lowerRight = LowerRightCornerBorder?.ToString() ?? (hasRightColumn ? " " : "");
+
+            yield return lowerMiddle.Bracket(lowerLeft, lowerRight, true);
+        }
     }
 }
 
@@ -167,5 +269,21 @@ public static class Extensions
             return $"{text.Substring(0, size - ellipsisLength)}{ellipsis ?? ""}";
         else
             return text.PadRight(size);
+    }
+
+    public static IEnumerable<T> ToSingleton<T>(this T element)
+    {
+        yield return element;
+    }
+    
+    public static void ForEach<T>(this IEnumerable<T> collection, Action<T> action)
+    {
+        if (action == null)
+            throw new ArgumentNullException(nameof(action));
+        
+        foreach (var item in collection)
+        {
+            action(item);
+        }
     }
 }
