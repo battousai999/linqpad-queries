@@ -15,9 +15,9 @@ let averaged xs =
     }
 
 let readings = [
-    { systolic = 139; diastolic = 77; pulse = 79 }
-    { systolic = 134; diastolic = 74; pulse = 76 }
-    { systolic = 127; diastolic = 76; pulse = 76 }
+    { systolic = 144; diastolic = 81; pulse = 87 }
+    { systolic = 139; diastolic = 79; pulse = 82 }
+    { systolic = 136; diastolic = 79; pulse = 84 }
 ]
 
 readings |> averaged |> Dump |> ignore

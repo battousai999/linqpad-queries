@@ -1,7 +1,6 @@
 <Query Kind="Program">
   <NuGetReference>Microsoft.Solver.Foundation</NuGetReference>
   <Namespace>Microsoft.SolverFoundation.Common</Namespace>
-  <Namespace>System.Numerics</Namespace>
 </Query>
 
 // Find value of element of Pascal's Triangle given (row, col) index (0-based)

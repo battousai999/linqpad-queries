@@ -25,6 +25,10 @@ void Main()
     DisplayWithFixedFont(TextEnclosure.Border('*').Enclose("With an asterisk"));
     
     DisplayWithFixedFont(TextEnclosure.Border('█', null, null, null, 2, 1).Enclose("With a block border"));
+    
+    var enclosure3 = new TextEnclosure(null, '—', null, null, null, null, null, null, 30, 30, "...", 0, 0);
+    
+    DisplayWithFixedFont(enclosure3.Enclose("Column Header #1"));
 }
 
 public void DisplayWithFixedFont<T>(T value)
@@ -145,7 +149,7 @@ public class TextEnclosure
         return String.Join(Environment.NewLine, EncloseAsList(text));
     }
     
-    public string Encluse(IEnumerable<string> lines)
+    public string Enclose(IEnumerable<string> lines)
     {
         return String.Join(Environment.NewLine, EncloseAsList(lines));
     }
