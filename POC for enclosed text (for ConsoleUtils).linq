@@ -6,16 +6,23 @@ void Main()
     
     DisplayWithFixedFont(enclosure.Enclose("This is a test"));
     DisplayWithFixedFont(enclosure.Enclose("This is a test\nAnd this is another"));
+    DisplayWithFixedFont(enclosure.Enclose(new List<string> { "This is a second test.", "And another." }));
 
-    DisplayWithFixedFont(
-        enclosure.Enclose(x =>
-        {
-            var text = "How about another test, eh?";
-            var spacing = new string(' ', Math.Max((x.MaxTextSize ?? text.Length) - text.Length, 0) / 2);
+    DisplayWithFixedFont(enclosure.Enclose(x => x.LeftJustifyText("how about another test, eh?")));
+    DisplayWithFixedFont(enclosure.Enclose(x => x.CenterText("how about another test, eh?")));
+    DisplayWithFixedFont(enclosure.Enclose(x => x.RightJustifyText("how about another test, eh?")));
+    
+    var test = new List<string>
+    {
+        enclosure.LeftJustifyText("how about another test, eh?"),
+        enclosure.CenterText("how about another test, eh?"),
+        enclosure.RightJustifyText("how about another test, eh?")
+    };
+    
+    test.Dump();
+    
+    test.Select(x => x.Length).Dump();
 
-            return $"{spacing}{text}{spacing}";
-        }));
-        
     DisplayWithFixedFont(TextEnclosure.DoubleBorder().Enclose("This is something else"));
     
     var enclosure2 = new TextEnclosure('═', '═', null, null, null, null, null, null, null, null, null, 0);
@@ -139,6 +146,39 @@ public class TextEnclosure
             verticalPadding);
     }
     
+    public string CenterText(string text)
+    {
+        if (text == null)
+            throw new ArgumentNullException(nameof(text));
+            
+        var maxTextSize = MaxTextSize == null ? text.Length : (MaxTextSize.Value - (2 * HorizontalPadding));        
+        var spacing = new string(' ', (Math.Max(maxTextSize - text.Length, 0) / 2) + HorizontalPadding);
+
+        return $"{spacing}{text.PadRight((MaxTextSize ?? text.Length) - spacing.Length)}";
+    }
+    
+    public string LeftJustifyText(string text)
+    {
+        if (text == null)
+            throw new ArgumentNullException(nameof(text));
+            
+        var maxTextSize = MaxTextSize == null ? text.Length : (MaxTextSize.Value - HorizontalPadding);
+        var padding = new string(' ', HorizontalPadding);
+
+        return $"{padding}{text.PadRight(maxTextSize)}";
+    }
+    
+    public string RightJustifyText(string text)
+    {
+        if (text == null)
+            throw new ArgumentNullException(nameof(text));
+            
+        var maxTextSize = MaxTextSize == null ? text.Length : (MaxTextSize.Value - HorizontalPadding);
+        var padding = new string(' ', HorizontalPadding);
+
+        return $"{text.PadLeft(maxTextSize)}{padding}";
+    }
+    
     public string Enclose(Func<TextEnclosure, string> textFunc)
     {
         return Enclose(textFunc(this));
@@ -176,10 +216,10 @@ public class TextEnclosure
         string transformLine(string line)
         {
             if (line.Length < MinTextSize)
-                line = line.PadRight(MinTextSize.Value);
+                line = line.PadRight(MinTextSize.Value - (2 * HorizontalPadding));
 
             if (line.Length > MaxTextSize)
-                line = line.PadRightWithEllipsis(MaxTextSize.Value, Ellipsis);
+                line = line.PadRightWithEllipsis(MaxTextSize.Value - (2 * HorizontalPadding), Ellipsis);
 
             if (HorizontalPadding > 0)
             {

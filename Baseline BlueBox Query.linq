@@ -10,6 +10,10 @@ void Main()
 	var password = Util.GetPassword("bluebox.uat.db.password");
 
 	BlueBox.Initialize($"Connection Timeout=60;Data Source=idrive-uat.database.windows.net;Initial Catalog=BlueBoxUat;Persist Security Info=True;User ID=idriveuat;Password={password}");
+	//BlueBox.Initialize($"Database=BlueBoxProduction;Server=idrive-data-fog.database.windows.net;User ID=BlueBoxAdmin;Password={password}");
+	
+	// Remember to update Edit -> Preferences -> Advanced -> "Do not shadow assembly reference" (under Execution) if you need line numbers in
+	// your stacktraces (also, changing that setting requires an restart of Linqpad).
 	
 	
 }
@@ -22,15 +26,22 @@ void Main()
 
 public static T InvokePrivateMethod<T>(object instance, string methodName, params object[] parameters)
 {
-	return InvokePrivateMethod<T>(instance, methodName, null, parameters);
+	return InvokeSpecificPrivateMethod<T>(null, instance, methodName, null, parameters);
 }
 
-public static T InvokePrivateMethod<T>(object instance, string methodName, Type[] typeArguments, params object[] parameters)
+public static T InvokePrivateStaticMethod<T>(Type staticType, string methodName, params object[] parameters)
 {
+	return InvokeSpecificPrivateMethod<T>(staticType, null, methodName, null, parameters);
+}
+
+public static T InvokeSpecificPrivateMethod<T>(Type staticType, object instance, string methodName, Type[] typeArguments, params object[] parameters)
+{
+	if ((staticType == null && instance == null) || (staticType != null && instance != null))
+		throw new ArgumentException("Provide either a staticType or an instance, but not both.");
 	if (string.IsNullOrWhiteSpace(methodName))
 		throw new ArgumentException("Method name cannot be null or empty.", nameof(methodName));
 
-	Type type = instance?.GetType() ?? throw new ArgumentNullException(nameof(instance));
+	Type type = staticType ?? instance?.GetType() ?? throw new ArgumentNullException(nameof(instance));
 
 	BindingFlags flags = BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static;
 	MethodInfo method = null;
@@ -58,10 +69,10 @@ public static T InvokePrivateMethod<T>(object instance, string methodName, Type[
 
 public static void InvokePrivateMethod(object instance, string methodName, params object[] parameters)
 {
-	InvokePrivateMethod<object>(instance, methodName, null, parameters);
+	InvokeSpecificPrivateMethod<object>(null, instance, methodName, null, parameters);
 }
 
 public static void InvokePrivateMethod(object instance, string methodName, Type[] typeArguments, params object[] parameters)
 {
-	InvokePrivateMethod<object>(instance, methodName, typeArguments, parameters);
+	InvokeSpecificPrivateMethod<object>(null, instance, methodName, typeArguments, parameters);
 }
