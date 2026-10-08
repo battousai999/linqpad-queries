@@ -8,12 +8,13 @@
 void Main()
 {
 	var isProd = false;
-	var password = Util.GetPassword($"bluebox.{(isProd ? "prod" : "uat")}.db.password");
+    var password = Util.GetPassword($"bluebox.{(isProd ? "prod" : "uat")}.db.password");
+    var server = Util.GetPassword($"bluebox.{(isProd ? "prod" : "uat")}.db.server");
 
-	if (isProd)
-		BlueBox.Initialize($"Database=BlueBoxProduction;Server=idrive-data-fog.database.windows.net;User ID=BlueBoxAdmin;Password={password}");
-	else
-		BlueBox.Initialize($"Connection Timeout=60;Data Source=idrive-uat.database.windows.net;Initial Catalog=BlueBoxUat;Persist Security Info=True;User ID=idriveuat;Password={password}");
+    if (isProd)
+        BlueBox.Initialize($"Database=BlueBoxProduction;Server={server};User ID=BlueBoxAdmin;Password={password}");
+    else
+        BlueBox.Initialize($"Connection Timeout=60;Data Source={server};Initial Catalog=BlueBoxUat;Persist Security Info=True;User ID=idriveuat;Password={password}");
 	
 	// Remember to update Edit -> Preferences -> Advanced -> "Do not shadow assembly reference" (under Execution) if you need line numbers in
 	// your stacktraces (also, changing that setting requires an restart of Linqpad).
