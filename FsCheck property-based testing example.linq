@@ -1,12 +1,14 @@
 <Query Kind="Program">
-  <NuGetReference>FsCheck</NuGetReference>
+  <NuGetReference Version="2.16.6">FsCheck</NuGetReference>
   <Namespace>FsCheck</Namespace>
 </Query>
 
 void Main()
 {
     Prop.ForAll((Func<List<int>, bool>)ReverseOfReverseIsEqualToOriginal).QuickCheck();
+    Console.WriteLine();
     Prop.ForAll((Func<List<int>, bool>)ReverseIsEqualToOriginal).QuickCheck();
+    Console.WriteLine();
     Prop.ForAll((Func<List<double>, bool>)ReverseOfReverseIsEqualToOriginalFloat).QuickCheck();
 }
 
